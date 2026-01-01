@@ -1,0 +1,9 @@
+# 根路径重定向到 index.html
+/ /index.html 200
+
+# 直接访问其他 HTML 文件
+/admin /admin.html 200
+/mobile /mobile.html 200
+
+# 404 页面重定向
+/* /index.html 404
