@@ -1,0 +1,59 @@
+# Netlify 项目配置文件
+# 用于配置构建、函数和路由规则
+
+# 基本设置
+[build]
+  # 发布目录，指向静态文件目录
+  publish = "public"
+  # 构建命令，这里不需要构建命令，因为是静态网站
+  command = ""
+  # 函数目录
+  functions = "netlify/functions"
+
+# 本地开发设置
+[dev]
+  # 本地开发端口
+  port = 8081
+  # 自动打开浏览器
+  autoLaunch = true
+
+# 路由规则
+[[redirects]]
+  # 将所有 /api/* 请求转发到 Netlify Functions
+  from = "/api/*"
+  to = "/.netlify/functions/main"
+  status = 200
+  force = true
+
+[[redirects]]
+  # 将 /health 请求转发到 Netlify Functions
+  from = "/health"
+  to = "/.netlify/functions/main"
+  status = 200
+  force = true
+
+[[redirects]]
+  # 404 页面重定向到 index.html
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# 环境变量
+[env]
+  # MongoDB 配置
+  MONGODB_URI = "${MONGODB_URI}"
+  DATABASE_NAME = "donation_system"
+  COLLECTION_NAME = "donations"
+  ADMIN_PASSWORD = "your-admin-password"
+
+  # 应用配置
+  APP_NAME = "donation-collection-system"
+  ENVIRONMENT = "development"
+  LOG_LEVEL = "info"
+  CORS_ORIGIN = "*"
+
+# 生产环境配置
+[context.production]
+  [context.production.env]
+    ENVIRONMENT = "production"
+    LOG_LEVEL = "warn"

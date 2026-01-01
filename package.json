@@ -1,0 +1,9 @@
+{  "name": "donation-collection-system",  "version": "1.0.0",  "description": "护持项目收集系统 - Netlify + MongoDB",  "type": "module",  "scripts": {
+    "dev": "netlify dev",
+    "build": "netlify functions:build --src netlify/functions",
+    "deploy": "netlify deploy",
+    "deploy:prod": "netlify deploy --prod",
+    "db:init": "node scripts/init-database.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "functions:serve": "netlify functions:serve --src netlify/functions"
+  },  "dependencies": {    "mongodb": "^5.7.0"  },  "engines": {    "node": ">=16.0.0"  },  "keywords": [    "donation",    "mongodb",    "netlify",    "functions",    "collection-system"  ],  "author": "Your Name",  "license": "MIT",  "repository": {    "type": "git",    "url": "https://github.com/yourusername/donation-collection-system.git"  }}
