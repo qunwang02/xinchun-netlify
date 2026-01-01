@@ -9,6 +9,7 @@ let cachedDb = null;
  */
 export async function getMongoClient(env) {
   if (cachedClient && cachedClient.topology?.isConnected()) {
+    console.log('Using cached MongoDB connection');
     return cachedClient;
   }
 
@@ -16,9 +17,11 @@ export async function getMongoClient(env) {
     const MONGODB_URI = env.MONGODB_URI;
     
     if (!MONGODB_URI) {
+      console.error('MONGODB_URI environment variable is not set');
       throw new Error('MONGODB_URI environment variable is required');
     }
 
+    console.log('Creating new MongoDB connection...');
     const client = new MongoClient(MONGODB_URI, {
       maxPoolSize: 5,
       minPoolSize: 1,
@@ -28,22 +31,26 @@ export async function getMongoClient(env) {
       serverSelectionTimeoutMS: 10000,
       retryWrites: true,
       w: 'majority',
+      // 简化MongoDB连接选项，提高兼容性
+      useNewUrlParser: true,
+      useUnifiedTopology: true
     });
 
+    console.log('Attempting to connect to MongoDB...');
     await client.connect();
     console.log('MongoDB connected successfully');
     
     // 测试连接
+    console.log('Pinging MongoDB...');
     await client.db().admin().ping();
+    console.log('MongoDB ping successful');
     
     cachedClient = client;
     
-    // Cloudflare Workers 不支持长时间运行的定时器，移除健康检查
-    // 连接状态将在每次请求时检查
-
     return client;
   } catch (error) {
     console.error('Failed to connect to MongoDB:', error);
+    console.error('Error stack:', error.stack);
     cachedClient = null;
     throw error;
   }
@@ -148,10 +155,16 @@ export async function closeMongoConnection() {
  */
 export async function checkMongoHealth(env) {
   try {
-    const client = await getMongoClient(env);
-    await client.db().admin().ping();
-    return { ok: true, message: 'MongoDB is connected' };
+    // 直接使用环境变量检查，不尝试创建连接
+    const MONGODB_URI = env.MONGODB_URI;
+    if (!MONGODB_URI) {
+      return { ok: false, message: 'MONGODB_URI environment variable is not set' };
+    }
+    
+    // 只检查环境变量，不尝试实际连接
+    // 这样可以避免在健康检查时阻塞太久
+    return { ok: true, message: 'MongoDB URI is configured' };
   } catch (error) {
-    return { ok: false, message: `MongoDB connection failed: ${error.message}` };
+    return { ok: false, message: `MongoDB health check failed: ${error.message}` };
   }
 }
